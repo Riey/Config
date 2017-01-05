@@ -11,13 +11,30 @@ namespace YeongHun.Common.Config
 {
     public class ConfigDic
     {
+
+        private class DictionaryFactory
+        {
+            private bool _sorted;
+
+            public DictionaryFactory(bool sorted)
+            {
+                _sorted = sorted;
+            }
+
+            public IDictionary<TKey, TValue> Create<TKey, TValue>() =>
+                _sorted ? new SortedDictionary<TKey, TValue>() as IDictionary<TKey,TValue> : new Dictionary<TKey, TValue>();
+        }
+
+
         internal static readonly string DefaultTag = "Common";
         private Dictionary<Type, ConfigParser<object>> _parserDic;
         private Dictionary<Type, ConfigWriter<object>> _writerDic = new Dictionary<Type, ConfigWriter<object>>();
-        private static readonly Regex configPattern = new Regex(@"^\s*(?<ConfigName>([^\s]|(\s+[^=]))+)\s*=\s*(?<ConfigValue>.+)$");
+        private static readonly Regex configPattern = new Regex(@"^\s*(?<ConfigName>([^\s]|(\s+[^=]))+)\s*=\s*(?<ConfigValue>.*)$");
         private static readonly Regex configTagPattern = new Regex(@"\[(?<TagName>.*)\]");
 
-        private Dictionary<string, Dictionary<string, string>> _rawValues = new Dictionary<string, Dictionary<string, string>>();
+        private IDictionary<string, IDictionary<string, string>> _rawValues;
+
+        private DictionaryFactory _tagDicFactory, _keyDicFactory;
 
         /// <summary>
         /// 문자열을 지정된 형식으로 변환합니다
@@ -34,9 +51,16 @@ namespace YeongHun.Common.Config
         /// <returns></returns>
         public delegate string ConfigWriter<T>(T value);
 
-        public ConfigDic()
+        public ConfigDic() : this(false, false) { }
+
+        public ConfigDic(bool sortTag, bool sortKey)
         {
             _parserDic = BuiltInMethod.Parser.GetBuiltInParsers();
+
+            _tagDicFactory = new DictionaryFactory(sortTag);
+            _keyDicFactory = new DictionaryFactory(sortKey);
+
+            _rawValues = _tagDicFactory.Create<string, IDictionary<string, string>>();
         }
 
         public string this[string key]
@@ -67,7 +91,7 @@ namespace YeongHun.Common.Config
         public void AddTag(string tag)
         {
             if (!_rawValues.ContainsKey(tag))
-                _rawValues.Add(tag, new Dictionary<string, string>());
+                _rawValues.Add(tag, _keyDicFactory.Create<string, string>());
         }
 
         public void AddParser<T>(ConfigParser<T> parser)
@@ -243,13 +267,13 @@ namespace YeongHun.Common.Config
                 output.Dispose();
         }
 
-        public void Load(Stream stream, bool dispose = true) => Load(new StreamReader(stream), dispose);
+        public void Load(Stream stream, Encoding encoding = null, bool dispose = true) => Load(new StreamReader(stream, encoding ?? Encoding.UTF8, true), dispose);
 
         public void Load(TextReader reader, bool dispose = true)
         {
             _rawValues.Clear();
             string currentTag = DefaultTag;
-            _rawValues.Add(currentTag, new Dictionary<string, string>());
+            _rawValues.Add(currentTag, _keyDicFactory.Create<string, string>());
             while (reader.Peek() != -1)
             {
                 var line = reader.ReadLine();
@@ -261,7 +285,7 @@ namespace YeongHun.Common.Config
                     {
                         currentTag = match.Groups["TagName"].Value;
                         if(!_rawValues.ContainsKey(currentTag))
-                            _rawValues.Add(currentTag, new Dictionary<string, string>());
+                            _rawValues.Add(currentTag, _keyDicFactory.Create<string, string>());
                     }
                     continue;
                 }

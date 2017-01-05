@@ -47,7 +47,7 @@ namespace YeongHun.Common.Config
             foreach(var field in _loadableFields)
             {
                 var attr = field.GetCustomAttribute<LoadableFieldAttribute>();
-                var tag = attr.Tag ?? GetType().Name;
+                var tag = attr.Tag ?? ConfigDic.DefaultTag;
                 var key = attr.Key ?? field.Name;
                 var defaultValue = attr.DefaultValue;
 
@@ -62,7 +62,7 @@ namespace YeongHun.Common.Config
             foreach (var property in _loadableProperties)
             {
                 var attr = property.GetCustomAttribute<LoadablePropertyAttribute>();
-                var tag = attr.Tag ?? GetType().Name;
+                var tag = attr.Tag ?? ConfigDic.DefaultTag;
                 var key = attr.Key ?? property.Name;
                 var defaultValue = attr.DefaultValue;
 
