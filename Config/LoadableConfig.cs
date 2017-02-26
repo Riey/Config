@@ -88,7 +88,7 @@ namespace YeongHun.Common.Config
                     select m).First().MakeGenericMethod(field.FieldType);
 
                 var attr = field.GetCustomAttribute<LoadableFieldAttribute>();
-                var tag = attr.Tag ?? GetType().Name;
+                var tag = attr.Tag ?? ConfigDic.DefaultTag;
                 var key = attr.Key ?? field.Name;
 
                 setValue.Invoke(configDic, new object[] { tag, key, field.GetValue(this) });
@@ -104,7 +104,7 @@ namespace YeongHun.Common.Config
                     select m).First().MakeGenericMethod(property.PropertyType);
 
                 var attr = property.GetCustomAttribute<LoadablePropertyAttribute>();
-                var tag = attr.Tag ?? GetType().Name;
+                var tag = attr.Tag ?? ConfigDic.DefaultTag;
                 var key = attr.Key ?? property.Name;
 
                 setValue.Invoke(configDic, new object[] { tag, key, property.GetValue(this) });
