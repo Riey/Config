@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace YeongHun.Common.Config
+namespace Riey.Common.Config
 {
     public abstract class LoadableConfig
     {

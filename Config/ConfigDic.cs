@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Reflection;
 
-namespace YeongHun.Common.Config
+namespace Riey.Common.Config
 {
     public class ConfigDic
     {

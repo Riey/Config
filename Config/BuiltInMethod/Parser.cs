@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YeongHun.Common.Config.BuiltInMethod
+namespace Riey.Common.Config.BuiltInMethod
 {
     static class Parser
     {

@@ -8,7 +8,7 @@
     <ProjectGuid>{0B616F64-43F6-4537-831F-2871F65E07EC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>YeongHun.Common.Config</RootNamespace>
+    <RootNamespace>Riey.Common.Config</RootNamespace>
     <AssemblyName>Config</AssemblyName>
     <DefaultLanguage>ko-KR</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
@@ -76,6 +76,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)Nuget\Config.1.3.0\lib\net\"
+copy "$(TargetPath)" "$(SolutionDir)Nuget\Config.1.3.0\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

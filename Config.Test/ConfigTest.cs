@@ -2,7 +2,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Text;
-using YeongHun.Common.Config;
+using Riey.Common.Config;
 using System.Text.RegularExpressions;
 
 namespace Config.Test
