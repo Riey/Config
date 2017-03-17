@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Reflection;
+using JetBrains.Annotations;
 
 namespace Riey.Common.Config
 {
@@ -14,7 +14,7 @@ namespace Riey.Common.Config
 
         private class DictionaryFactory
         {
-            private bool _sorted;
+            private readonly bool _sorted;
 
             public DictionaryFactory(bool sorted)
             {
@@ -27,14 +27,24 @@ namespace Riey.Common.Config
 
 
         internal static readonly string DefaultTag = "Common";
-        private Dictionary<Type, ConfigParser<object>> _parserDic;
-        private Dictionary<Type, ConfigWriter<object>> _writerDic = new Dictionary<Type, ConfigWriter<object>>();
+
+        [NotNull]
+        private readonly Dictionary<Type, ConfigParser<object>> _parserDic;
+
+        [NotNull]
+        private readonly Dictionary<Type, ConfigWriter<object>> _writerDic = new Dictionary<Type, ConfigWriter<object>>();
+
+        [NotNull]
         private static readonly Regex configPattern = new Regex(@"^\s*(?<ConfigName>([^\s]|(\s+[^=]))+)\s*=\s*(?<ConfigValue>.*)$");
+
+        [NotNull]
         private static readonly Regex configTagPattern = new Regex(@"\[(?<TagName>.*)\]");
 
-        private IDictionary<string, IDictionary<string, string>> _rawValues;
+        [NotNull]
+        private readonly IDictionary<string, IDictionary<string, string>> _rawValues;
 
-        private DictionaryFactory _tagDicFactory, _keyDicFactory;
+        [NotNull]
+        private readonly DictionaryFactory _tagDicFactory, _keyDicFactory;
 
         /// <summary>
         /// 문자열을 지정된 형식으로 변환합니다
@@ -196,11 +206,12 @@ namespace Riey.Common.Config
                     return false;
                 }
             }
-            var parse = typeof(T).GetRuntimeMethods()
-                .Where(
-                method => method.Name == "Parse" &&
-                method.Attributes.HasFlag(MethodAttributes.Static)&&
-                method.ReturnType == typeof(T)).FirstOrDefault();
+
+            var parse = typeof(T)
+                .GetRuntimeMethods()
+                .FirstOrDefault(method => method.Name == "Parse" &&
+                                          method.Attributes.HasFlag(MethodAttributes.Static) &&
+                                          method.ReturnType == typeof(T));
 
             if (parse == null)
                 return false;
@@ -219,8 +230,8 @@ namespace Riey.Common.Config
             }
         }
 
-        public bool TryGetValue<T>(string key, out T value, string defaultString, T defaultValue) => TryGetValue(DefaultTag, key, out value, defaultString, defaultValue);
-        public bool TryGetValue<T>(string tag, string key, out T value, string defaultString, T defaultValue)
+        public bool TryGetValue<T>(string key, out T value, [CanBeNull] string defaultString, T defaultValue) => TryGetValue(DefaultTag, key, out value, defaultString, defaultValue);
+        public bool TryGetValue<T>(string tag, string key, out T value, [CanBeNull] string defaultString, T defaultValue)
         {
             value = defaultValue;
             bool ReturnDefault()
@@ -274,10 +285,12 @@ namespace Riey.Common.Config
             _rawValues.Clear();
             string currentTag = DefaultTag;
             _rawValues.Add(currentTag, _keyDicFactory.Create<string, string>());
+
             while (reader.Peek() != -1)
             {
-                var line = reader.ReadLine();
-                var match = configPattern.Match(line);
+                string line = reader.ReadLine();
+                Match match = configPattern.Match(line);
+
                 if (!match.Success)
                 {
                     match = configTagPattern.Match(line);
@@ -289,6 +302,7 @@ namespace Riey.Common.Config
                     }
                     continue;
                 }
+
                 _rawValues[currentTag].Add(match.Groups["ConfigName"].Value, match.Groups["ConfigValue"].Value);
             }
 

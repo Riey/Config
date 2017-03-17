@@ -22,20 +22,20 @@ namespace Riey.Common.Config.BuiltInMethod
         [Parser(typeof(string))]
         public static object StringParser(string rawStr) => rawStr;
 
-        [Parser(typeof(Int64))]
-        public static object Int64Parser(string rawStr) => Int64.Parse(rawStr);
+        [Parser(typeof(long))]
+        public static object Int64Parser(string rawStr) => long.Parse(rawStr);
 
-        [Parser(typeof(Int32))]
-        public static object Int32Parser(string rawStr) => Int32.Parse(rawStr);
+        [Parser(typeof(int))]
+        public static object Int32Parser(string rawStr) => int.Parse(rawStr);
 
-        [Parser(typeof(Int16))]
-        public static object Int16Parser(string rawStr) => Int16.Parse(rawStr);
+        [Parser(typeof(short))]
+        public static object Int16Parser(string rawStr) => short.Parse(rawStr);
 
-        [Parser(typeof(Byte))]
-        public static object ByteParser(string rawStr) => Byte.Parse(rawStr);
+        [Parser(typeof(byte))]
+        public static object ByteParser(string rawStr) => byte.Parse(rawStr);
 
-        [Parser(typeof(Boolean))]
-        public static object BooleanParser(string rawStr) => Boolean.Parse(rawStr);
+        [Parser(typeof(bool))]
+        public static object BooleanParser(string rawStr) => bool.Parse(rawStr);
 
         public static Dictionary<Type, ConfigDic.ConfigParser<object>> GetBuiltInParsers()
         {
