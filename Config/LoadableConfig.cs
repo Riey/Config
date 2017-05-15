@@ -10,7 +10,7 @@ namespace Riey.Common.Config
         private readonly FieldInfo[] _loadableFields;
         private readonly PropertyInfo[] _loadableProperties;
 
-        public LoadableConfig()
+        protected LoadableConfig()
         {
             _loadableFields =
                 GetType().GetRuntimeFields().Where(field => field.IsDefined(typeof(LoadableFieldAttribute))).ToArray();
@@ -30,7 +30,7 @@ namespace Riey.Common.Config
         }
 
         [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
-        public abstract class ConfigItemAttribute : Attribute
+        protected abstract class ConfigItemAttribute : Attribute
         {
             [CanBeNull]
             public string Tag { get; set; }
@@ -47,7 +47,7 @@ namespace Riey.Common.Config
         }
 
         [AttributeUsage(AttributeTargets.Property)]
-        public class LoadablePropertyAttribute : ConfigItemAttribute
+        protected class LoadablePropertyAttribute : ConfigItemAttribute
         {
             public LoadablePropertyAttribute(string defaultValue) : base(defaultValue)
             {
@@ -55,7 +55,7 @@ namespace Riey.Common.Config
         }
 
         [AttributeUsage(AttributeTargets.Field)]
-        public class LoadableFieldAttribute : ConfigItemAttribute
+        protected class LoadableFieldAttribute : ConfigItemAttribute
         {
             public LoadableFieldAttribute(string defaultValue) : base(defaultValue)
             {
@@ -79,8 +79,9 @@ namespace Riey.Common.Config
                 if (!configDic.HasKey(tag, key))
                     configDic.SetValue(tag, key, defaultValue);
 
-                field.SetValue(this,
-                    getValue.MakeGenericMethod(field.FieldType).Invoke(configDic, new object[] {tag, key}));
+                field.SetValue(
+                               this,
+                               getValue.MakeGenericMethod(field.FieldType).Invoke(configDic, new object[] {tag, key}));
             }
 
             foreach (var property in _loadableProperties)
@@ -95,8 +96,10 @@ namespace Riey.Common.Config
                 if (!configDic.HasKey(tag, key))
                     configDic.SetValue(tag, key, defaultValue);
 
-                property.SetValue(this,
-                    getValue.MakeGenericMethod(property.PropertyType).Invoke(configDic, new object[] {tag, key}));
+                property.SetValue(
+                                  this,
+                                  getValue.MakeGenericMethod(property.PropertyType)
+                                          .Invoke(configDic, new object[] {tag, key}));
             }
         }
 
@@ -106,11 +109,12 @@ namespace Riey.Common.Config
             foreach (var field in _loadableFields)
             {
                 MethodInfo setValue = (
-                    from m in typeof(ConfigDic).GetRuntimeMethods()
-                    where m.Name == "SetValue" && m.IsGenericMethodDefinition
-                    let parameter = m.GetParameters()
-                    where parameter.Length == 3
-                    select m).First().MakeGenericMethod(field.FieldType);
+                                          from m in typeof(ConfigDic).GetRuntimeMethods()
+                                          where m.Name == "SetValue" && m.IsGenericMethodDefinition
+                                          let parameter = m.GetParameters()
+                                          where parameter.Length == 3
+                                          select m).First()
+                                                   .MakeGenericMethod(field.FieldType);
 
                 var attr = field.GetCustomAttribute<LoadableFieldAttribute>();
                 string tag = attr.Tag ?? ConfigDic.DefaultTag;
@@ -122,11 +126,12 @@ namespace Riey.Common.Config
             foreach (var property in _loadableProperties)
             {
                 MethodInfo setValue = (
-                    from m in typeof(ConfigDic).GetRuntimeMethods()
-                    where m.Name == "SetValue" && m.IsGenericMethodDefinition
-                    let parameter = m.GetParameters()
-                    where parameter.Length == 3
-                    select m).First().MakeGenericMethod(property.PropertyType);
+                                          from m in typeof(ConfigDic).GetRuntimeMethods()
+                                          where m.Name == "SetValue" && m.IsGenericMethodDefinition
+                                          let parameter = m.GetParameters()
+                                          where parameter.Length == 3
+                                          select m).First()
+                                                   .MakeGenericMethod(property.PropertyType);
 
                 var attr = property.GetCustomAttribute<LoadablePropertyAttribute>();
                 string tag = attr.Tag ?? ConfigDic.DefaultTag;
