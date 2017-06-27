@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Riey.Common.Config</id>
+    <version>1.3.1.1</version>
+    <title>Riey.Common.Config</title>
+    <authors>Riey</authors>
+    <owners>Riey</owners>
+    <licenseUrl>http://github.com/Riey/Config/LICENSE</licenseUrl>
+    <projectUrl>http://github.com/Riey/Config</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Text configuration file library</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>Config</tags>
+  </metadata>
+</package>
